@@ -12,6 +12,7 @@
 <title>DCSO Employee Portal</title>
 <style>
 *{box-sizing:border-box}
+
 body{margin:0;background:#0b1728;color:white;font-family:Arial,sans-serif}
 header{background:#07111e;color:#d9ad52;text-align:center;padding:18px;font-size:19px;font-weight:bold}
 .banner{width:100%;display:block}
@@ -33,7 +34,6 @@ nav button{background:none;border:0;color:white;font-size:11px;padding:7px 0;cur
 nav span{display:block;font-size:23px;margin-bottom:5px}
 @media(min-width:650px){.tiles{grid-template-columns:repeat(3,1fr)}}
 </style>
-</head>
 <body>
 
 <img class="banner" src="DCSO_Original_Banner.jpg" alt="DCSO Banner">
@@ -122,6 +122,15 @@ p.classList.toggle('active',p.id===id);
 window.scrollTo(0,0);
 }
 </script>
+  
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+
 </body>
 </html>
 
