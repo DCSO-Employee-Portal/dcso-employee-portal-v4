@@ -2,6 +2,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1728">
+<title>DCSO Employee Portal</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1728;color:white;font-family:Arial,sans-serif}
+header{background:#07111e;color:#d9ad52;text-align:center;padding:18px;font-size:19px;font-weight:bold}
+.banner{width:100%;display:block}
+main{padding:18px 15px 95px;max-width:750px;margin:auto}
+h1{text-align:center;font-size:25px}
+.intro{text-align:center;color:#c4cfda;line-height:1.5}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:25px}
+.tile{background:#142940;border:1.5px solid #d9ad52;border-radius:17px;color:white;min-height:135px;padding:12px;font-size:15px;font-weight:bold;cursor:pointer}
+.tile span{display:block;font-size:29px;margin-bottom:15px}
+.page{display:none}
+.page.active{display:block}
+.card{background:#142940;border:1px solid #40556a;border-radius:14px;padding:18px;margin:13px 0}
+.card h3{color:#d9ad52;margin-top:0}
+.card p{color:#c4cfda;line-height:1.5}
+.back,.link{background:#203951;color:white;border:1px solid #d9ad52;border-radius:9px;padding:12px;display:inline-block;text-decoration:none;margin:7px 0;cursor:pointer}
+.link{display:block}
+nav{position:fixed;bottom:0;left:0;right:0;background:#07111e;border-top:1px solid #d9ad52;display:grid;grid-template-columns:repeat(5,1fr);padding:9px 0}
+nav button{background:none;border:0;color:white;font-size:11px;padding:7px 0;cursor:pointer}
+nav span{display:block;font-size:23px;margin-bottom:5px}
+@media(min-width:650px){.tiles{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header>DCSO EMPLOYEE PORTAL</header>
+<img class="banner" src="DCSO_Original_Banner.jpg" alt="DCSO Banner">
+
+<main>
+<section id="home" class="page active">
+<h1>Welcome to the Employee Portal</h1>
+<p class="intro">Department resources, forms, schedules and information in one place.</p>
+<div class="tiles">
+<button class="tile" onclick="show('calendar')"><span>▦</span>Department Calendar</button>
+<button class="tile" onclick="show('forms')"><span>☑</span>Forms & Reports</button>
+<button class="tile" onclick="show('training')"><span>🎓</span>Training Division</button>
+<button class="tile" onclick="show('policies')"><span>📋</span>Policies & SOPs</button>
+<button class="tile" onclick="show('divisions')"><span>🛡️</span>Division Resources</button>
+<button class="tile" onclick="show('resources')"><span>📁</span>Employee Resources</button>
+</div>
+</section>
+
+<section id="calendar" class="page">
+<button class="back" onclick="show('home')">← Back</button>
+<h1>Department Calendar</h1>
+<div class="card">
+<h3>Department Schedule</h3>
+<p>View the current department calendar.</p>
+<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/home" target="_blank" rel="noopener">Open Workspace Calendar</a>
+</div>
+</section>
+
+<section id="forms" class="page">
+<button class="back" onclick="show('home')">← Back</button>
+<h1>Forms & Reports</h1>
+<div class="card"><h3>Employee Requests</h3><p>Leave, overtime, training, equipment and supply forms.</p></div>
+<div class="card"><h3>Vehicle Forms</h3><p>Daily inspections, weekly inspections and maintenance.</p></div>
+<div class="card"><h3>Supervisor Forms</h3><p>Administrative and supervisor reports.</p>
+<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/home" target="_blank" rel="noopener">Open Workspace Forms</a></div>
+</section>
+
+<section id="training" class="page">
+<button class="back" onclick="show('home')">← Back</button>
+<h1>Training Division</h1>
+<div class="card"><h3>Training Resources</h3>
+<p>Training information, schedules and department resources.</p>
+<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/training" target="_blank" rel="noopener">Open Training Resources</a></div>
+</section>
+
+<section id="policies" class="page">
+<button class="back" onclick="show('home')">← Back</button>
+<h1>Policies & SOPs</h1>
+<div class="card"><h3>Department Policies</h3>
+<p>Access current policies and standard operating procedures.</p>
+<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/home" target="_blank" rel="noopener">Open Workspace Policies</a></div>
+</section>
+
+<section id="divisions" class="page">
+<button class="back" onclick="show('home')">← Back</button>
+<h1>Division Resources</h1>
+<div class="card"><h3>Patrol Division</h3><p>Patrol resources and procedures.</p></div>
+<div class="card"><h3>Criminal Investigations</h3><p>Investigations resources.</p></div>
+<div class="card"><h3>Detention</h3><p>Jail operations and resources.</p></div>
+<div class="card"><h3>Other Divisions</h3><p>Court Services, SRO and authorized administrative resources.</p>
+<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/home" target="_blank" rel="noopener">Open Division Workspace</a></div>
+</section>
+
+<section id="resources" class="page">
+<button class="back" onclick="show('home')">← Back</button>
+<h1>Employee Resources</h1>
+<div class="card"><h3>Employee Documents</h3>
+<p>Employee information, shared documents and department resources.</p>
+<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/employee-resources" target="_blank" rel="noopener">Open Employee Resources</a></div>
+</section>
+</main>
+
+<nav>
+<button onclick="show('home')"><span>⌂</span>Home</button>
+<button onclick="show('calendar')"><span>▦</span>Calendar</button>
+<button onclick="show('forms')"><span>☑</span>Forms</button>
+<button onclick="show('training')"><span>🎓</span>Training</button>
+<button onclick="show('divisions')"><span>☷</span>Divisions</button>
+</nav>
+
+<script>
+function show(id){
+document.querySelectorAll('.page').forEach(p=>{
+p.classList.toggle('active',p.id===id);
+});
+window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1728">
