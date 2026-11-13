@@ -129,16 +129,62 @@ rel="noopener noreferrer">
 <a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/home" target="_blank" rel="noopener">Open Workspace Forms</a></div>
 </section>
 
-<section id="training" class="page">
-<button class="back" onclick="show('home')">← Back</button>
-<h1>Training Division</h1>
-<div class="card"><h3>Training Resources</h3>
-<p>Training information, schedules and department resources.</p>
 
-<a class="link" href="https://sites.google.com/dadesheriffworkspace.com/dcso-employee-portal/training" target="_blank" rel="noopener noreferrer">🎓 Open DCSO Training Division</a>
-</div>
+<section id="training" class="page">
+
+  <button class="back" onclick="show('home')">
+    ← Back
+  </button>
+
+  <h1>Training Division</h1>
+
+  <div class="card">
+    <h3>🎓 DCSO Training Center</h3>
+    <p>Select a training resource below.</p>
+  </div>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    📅 Annual Training Calendar
+  </a>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    🗓️ Training Schedules
+  </a>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    📖 Lesson Plans
+  </a>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    📚 Training Materials
+  </a>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    📋 Training Rosters
+  </a>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    🏅 Certifications
+  </a>
+
+  <a class="link"
+     href="https://docs.google.com/forms/d/e/1FAIpQLSefiMCavXcrTNd3GvsNCoEWqYmkyIzlcQB_b_jHgDjWAneWtQ/viewform"
+     target="_blank"
+     rel="noopener noreferrer">
+    📝 Training Request Form
+  </a>
+
+  <a class="link" href="#" onclick="return trainingInfo(event)">
+    👨‍🏫 Instructor Resources
+  </a>
+
+  <div class="card">
+    <h3>Training Announcements</h3>
+    <p>Upcoming training notices will appear here.</p>
+  </div>
 
 </section>
+
 
 
 <section id="policies" class="page">
@@ -199,7 +245,15 @@ p.classList.toggle('active',p.id===id);
 window.scrollTo(0,0);
 }
 </script>
-  
+ 
+<script>
+function trainingInfo(event) {
+  event.preventDefault();
+  alert("This training resource is being prepared. Please check back soon.");
+  return false;
+}
+</script>
+ 
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
