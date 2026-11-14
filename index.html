@@ -44,6 +44,21 @@ nav span{display:block;font-size:23px;margin-bottom:5px}
 <p class="intro">Department resources, forms, schedules and information in one place.</p>
   
 <div class="card">
+  <h3>🔎 DCSO Smart Search</h3>
+  <p>Search department forms, policies, training and resources.</p>
+
+  <input
+    type="search"
+    id="dcsoSearch"
+    placeholder="What are you looking for?"
+    oninput="searchDCSO()"
+    style="width:100%;box-sizing:border-box;padding:14px;border-radius:10px;font-size:16px;"
+  >
+
+  <div id="dcsoResults" aria-live="polite"></div>
+</div>
+
+<div class="card">
   <h3>📢 Department Announcements</h3>
   <p>Important department notices, updates,
   and employee announcements.</p>
@@ -376,7 +391,59 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<script>
+const dcsoResources = [
+  {name:"Department Announcements",keywords:"news notices updates",page:"home"},
+  {name:"Leave Request Form",keywords:"vacation time off leave",page:"forms"},
+  {name:"Overtime Request Form",keywords:"overtime extra hours pay",page:"forms"},
+  {name:"Training Division",keywords:"classes certification training",page:"training"},
+  {name:"Policies & SOPs",keywords:"policy procedures general orders",page:"policies"},
+  {name:"Department Calendar",keywords:"schedule events calendar",page:"calendar"},
+  {name:"Employee Resources",keywords:"handbook benefits documents",page:"resources"},
+  {name:"Division Resources",keywords:"patrol investigations detention command staff",page:"divisions"},
+  {name:"AskBlue Georgia Legal Reference",keywords:"askblue blue360 georgia law statutes",url:"https://askblue.blue360media.com/reference?j=ga-2300244DE01"},
+  {name:"Georgia Law Enforcement Lawbook",keywords:"blue360 lawbook legal reference",url:"https://blue360media.com/my-library/resources/8010801EP01"}
+];
 
+function searchDCSO() {
+  const input = document.getElementById("dcsoSearch");
+  const results = document.getElementById("dcsoResults");
+  const query = input.value.trim().toLowerCase();
+
+  results.replaceChildren();
+  if (!query) return;
+
+  const matches = dcsoResources.filter(item =>
+    (item.name + " " + item.keywords)
+      .toLowerCase().includes(query)
+  );
+
+  if (!matches.length) {
+    results.textContent = "No matching resources found.";
+    return;
+  }
+
+  matches.forEach(item => {
+    const link = document.createElement("a");
+    link.className = "link";
+    link.textContent = "📁 " + item.name;
+
+    if (item.url) {
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    } else {
+      link.href = "#";
+      link.addEventListener("click", event => {
+        event.preventDefault();
+        show(item.page);
+      });
+    }
+
+    results.appendChild(link);
+  });
+}
+</script>
 </body>
 </html>
 
