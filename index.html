@@ -42,7 +42,22 @@ nav span{display:block;font-size:23px;margin-bottom:5px}
 <section id="home" class="page active">
 <h1>Welcome to the Employee Portal</h1>
 <p class="intro">Department resources, forms, schedules and information in one place.</p>
-  
+ <!-- DCSO Notification Center -->
+<div class="card" id="notificationCenter">
+  <h3>🔔 Notifications</h3>
+  <p>View important updates and items requiring your attention.</p>
+
+  <button
+    class="link"
+    type="button"
+    onclick="toggleNotifications()">
+    🔔 View Notifications
+  </button>
+
+  <div id="notificationList" style="display:none; margin-top:15px;">
+    <p>No new notifications.</p>
+  </div>
+</div> 
 <div class="card">
   <h3>🔎 DCSO Smart Search</h3>
   <p>Search department forms, policies, training and resources.</p>
@@ -444,6 +459,17 @@ function searchDCSO() {
   });
 }
 </script>
+ <script>
+function toggleNotifications() {
+  const panel = document.getElementById("notificationList");
+
+  if (panel.style.display === "none") {
+    panel.style.display = "block";
+  } else {
+    panel.style.display = "none";
+  }
+}
+</script> 
 </body>
 </html>
 
