@@ -47,22 +47,22 @@ nav span{display:block;font-size:23px;margin-bottom:5px}
   <h3>🔔 Notifications</h3>
   <p>View important updates and items requiring your attention.</p>
 
-  <button
-    class="link"
-    type="button"
-    onclick="toggleNotifications()">
-   🔔 View Notifications
-<span id="notificationBadge"
-      style="display:none; background:#d62828; color:white;
-             border-radius:20px; padding:3px 8px;
-             margin-left:8px; font-weight:bold;">
-  1
-</span> 
-  </button>
+ <a class="link"
+   href="https://script.google.com/a/macros/dadesheriffworkspace.com/s/AKfycbw5zNAwQS66s_T0f8XhOf3nhSj9akXUjHxuxdRYo7qBQKMyK2PQZMOY5L_ZfPFqMcfM/exec"
+   target="_blank"
+   rel="noopener noreferrer">
+   🔔 View Supervisor Notifications
+</a>
 
  <div id="notificationList" style="display:none; margin-top:15px;">
   <p id="notificationStatus">Checking notifications...</p>
   <div id="notificationItems"></div>
+   <button
+  type="button"
+  onclick="openIdentityTest()"
+  style="margin-top:12px;padding:10px 15px;">
+  🔐 Test Employee Login
+</button>
 </div>
 </div> 
 <div class="card">
@@ -396,6 +396,17 @@ p.classList.toggle('active',p.id===id);
 });
 window.scrollTo(0,0);
 }
+function openIdentityTest() {
+  function openIdentityTest() {
+  const url = https://script.google.com/a/macros/dadesheriffworkspace.com/s/AKfycbyc5tva0PNrAOCv_3XwBwpuECqRMquA2TO8DHFCv1nNeJA0ZTZoeJYH24O24RZ_SZU1/exec 
+
+  if (url.includes("PASTE_IDENTITY_TEST")) {
+    alert("Identity test URL has not been configured.");
+    return;
+  }
+
+  window.open(url, "_blank", "noopener,noreferrer");
+}  
 </script>
  
 <script>
