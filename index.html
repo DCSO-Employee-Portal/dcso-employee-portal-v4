@@ -467,6 +467,18 @@ function searchDCSO() {
 }
 </script>
  <script>
+ // DCSO notification badge display test
+function testNotificationBadge() {
+  const badge = document.getElementById("notificationBadge");
+
+  if (!badge) return;
+
+  badge.textContent = "1";
+  badge.style.display = "inline-block";
+}
+
+// Temporary test: show one pending notification
+window.addEventListener("load", testNotificationBadge);  
 function toggleNotifications() {
   const panel = document.getElementById("notificationList");
 
