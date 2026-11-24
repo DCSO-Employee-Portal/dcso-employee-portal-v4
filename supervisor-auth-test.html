@@ -162,10 +162,36 @@ async function handleCredentialResponse(response) {
       return;
     }
 
-    status.textContent =
-      "Google Workspace identity successfully verified.";
+    if (
+  data.authenticated !== true ||
+  data.authorized !== true ||
+  !Number.isInteger(data.pendingCount) ||
+  data.pendingCount < 0
+) {
+  status.textContent =
+    "Supervisor authorization or notification count unavailable.";
+  status.style.color = "#ff7777";
+  return;
+}
 
-    status.style.color = "#75e09a";
+const divisions = Array.isArray(data.permissions)
+  ? data.permissions.map(p => p.division).join(", ")
+  : "Unavailable";
+
+status.style.whiteSpace = "pre-line";
+status.style.lineHeight = "1.8";
+status.style.textAlign = "left";
+status.style.color = "#75e09a";
+
+status.textContent =
+  "✅ DCSO Supervisor Access Verified\n\n" +
+  "Name: " + (data.name || "Unavailable") + "\n" +
+  "Rank: " + (data.rank || "Unavailable") + "\n" +
+  "Authorized Divisions: " + divisions + "\n" +
+  "Department-Wide Access: " +
+  (data.departmentWide === true ? "YES" : "NO") +
+  "\n\n" +
+  "🔔 Pending Notifications: " + data.pendingCount;
 
   } catch (error) {
 
