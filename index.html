@@ -10,6 +10,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1728">
 <title>DCSO Employee Portal</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
 *{box-sizing:border-box}
 
@@ -42,32 +45,88 @@ nav span{display:block;font-size:23px;margin-bottom:5px}
 <section id="home" class="page active">
 <h1>Welcome to the Employee Portal</h1>
 <p class="intro">Department resources, forms, schedules and information in one place.</p>
- <!-- DCSO Notification Center -->
+<!-- DCSO Secure Notification Center -->
+
 <div class="card" id="notificationCenter">
-  <h3>🔔 Notifications</h3>
-  <a class="link" href="./supervisor-auth-test.html">
-  🔐 Supervisor Sign-In (Test)
-</a>
+
+  <h3>
+    🔔 Notifications
+
+    <span id="notificationBadge"
+      style="display:none;
+      background:#dc2626;
+      color:white;
+      border-radius:20px;
+      padding:4px 11px;
+      font-size:14px;
+      margin-left:8px;">
+    </span>
+  </h3>
+
   <p>View important updates and items requiring your attention.</p>
 
- <a class="link"
-   href="https://script.google.com/a/macros/dadesheriffworkspace.com/s/AKfycbw5zNAwQS66s_T0f8XhOf3nhSj9akXUjHxuxdRYo7qBQKMyK2PQZMOY5L_ZfPFqMcfM/exec"
-   target="_blank"
-   rel="noopener noreferrer">
-   🔔 View Supervisor Notifications
-</a>
+  <div id="supervisorLogin">
 
- <div id="notificationList" style="display:none; margin-top:15px;">
-  <p id="notificationStatus">Checking notifications...</p>
-  <div id="notificationItems"></div>
-   <button
-  type="button"
-  onclick="openIdentityTest()"
-  style="margin-top:12px;padding:10px 15px;">
-  🔐 Test Employee Login
-</button>
+    <p>Supervisors: Sign in using your DCSO Workspace account.</p>
+
+    <div id="g_id_onload"
+      data-client_id="728564434593-6o7o1var2gmt6m4c4shhcc6vd33ak9ec.apps.googleusercontent.com"
+      data-callback="handleSupervisorCredential"
+      data-auto_prompt="false">
+    </div>
+
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="signin_with"
+      data-shape="rectangular"
+      data-logo_alignment="left">
+    </div>
+
+  </div>
+
+  <p id="supervisorStatus"
+     role="status"
+     aria-live="polite"
+     style="font-size:14px;">
+    Supervisor sign-in required.
+  </p>
+
+  <div id="supervisorPanel" style="display:none;">
+
+    <p id="supervisorName"
+       style="color:#d9ad52;font-weight:bold;">
+    </p>
+
+    <p id="supervisorScope"></p>
+
+    <a class="link"
+       href="https://script.google.com/a/macros/dadesheriffworkspace.com/s/AKfycbw5zNAwQS66s_T0f8XhOf3nhSj9akXUjHxuxdRYo7qBQKMyK2PQZMOY5L_ZfPFqMcfM/exec"
+       target="_blank"
+       rel="noopener noreferrer">
+       🔔 View Supervisor Notifications
+    </a>
+
+    <button type="button"
+       class="link"
+       style="width:100%;"
+       onclick="refreshSupervisorNotifications()">
+       🔄 Refresh Notifications
+    </button>
+
+    <button type="button"
+       class="link"
+       style="width:100%;"
+       onclick="signOutSupervisor()">
+       🔒 Sign Out of Supervisor Notifications
+    </button>
+
+  </div>
+
 </div>
-</div> 
+
+<!-- End DCSO Secure Notification Center -->
 <div class="card">
   <h3>🔎 DCSO Smart Search</h3>
   <p>Search department forms, policies, training and resources.</p>
@@ -472,16 +531,225 @@ function searchDCSO() {
 </script>
  <script>
  
-function toggleNotifications() {
-  const panel = document.getElementById("notificationList");
+<script>
 
-  if (panel.style.display === "none") {
-    panel.style.display = "block";
-  } else {
-    panel.style.display = "none";
+const SUPERVISOR_API =
+  "https://dcso-supervisor-api-728564434593.us-east1.run.app";
+
+let supervisorCredential = null;
+let supervisorRefreshTimer = null;
+let supervisorExpiryTimer = null;
+let supervisorSession = 0;
+let supervisorRequest = 0;
+
+function handleSupervisorCredential(response) {
+
+  clearSupervisorSession();
+
+  if (!response || !response.credential) {
+    setSupervisorStatus("Google sign-in unsuccessful.", true);
+    return;
   }
+
+  supervisorCredential = response.credential;
+
+  refreshSupervisorNotifications();
 }
-</script> 
+
+function setSupervisorStatus(message, isError = false) {
+
+  const status = document.getElementById("supervisorStatus");
+
+  status.textContent = message;
+  status.style.color = isError ? "#ff7777" : "#c4cfda";
+
+}
+
+function clearSupervisorSession() {
+
+  supervisorSession++;
+  supervisorRequest++;
+
+  supervisorCredential = null;
+
+  clearInterval(supervisorRefreshTimer);
+  clearTimeout(supervisorExpiryTimer);
+
+  supervisorRefreshTimer = null;
+  supervisorExpiryTimer = null;
+
+  const badge = document.getElementById("notificationBadge");
+
+  badge.textContent = "";
+  badge.style.display = "none";
+
+  document.getElementById("supervisorPanel").style.display = "none";
+  document.getElementById("supervisorLogin").style.display = "block";
+
+  document.getElementById("supervisorName").textContent = "";
+  document.getElementById("supervisorScope").textContent = "";
+
+}
+
+async function refreshSupervisorNotifications() {
+
+  if (!supervisorCredential) return;
+
+  const session = supervisorSession;
+  const request = ++supervisorRequest;
+  const credential = supervisorCredential;
+
+  setSupervisorStatus("Checking supervisor notifications...");
+
+  try {
+
+    const result = await fetch(SUPERVISOR_API, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        credential: credential
+      }),
+
+      cache: "no-store",
+      redirect: "error"
+
+    });
+
+    const data = await result.json();
+
+    if (
+      session !== supervisorSession ||
+      request !== supervisorRequest
+    ) return;
+
+    if (
+      !result.ok ||
+      data.success !== true ||
+      data.authenticated !== true ||
+      data.authorized !== true ||
+      !Number.isInteger(data.pendingCount) ||
+      data.pendingCount < 0
+    ) {
+
+      clearSupervisorSession();
+
+      setSupervisorStatus(
+        data.message || "Supervisor access denied.",
+        true
+      );
+
+      return;
+    }
+
+    const badge =
+      document.getElementById("notificationBadge");
+
+    badge.textContent = data.pendingCount;
+
+    badge.style.display = "inline-block";
+
+    badge.style.background =
+      data.pendingCount > 0 ? "#dc2626" : "#15803d";
+
+    document.getElementById("supervisorName").textContent =
+      (data.name || "Supervisor") +
+      (data.rank ? " — " + data.rank : "");
+
+    const divisions = Array.isArray(data.permissions)
+      ? data.permissions.map(p => p.division).join(", ")
+      : "";
+
+    document.getElementById("supervisorScope").textContent =
+      data.departmentWide === true
+        ? "Department-Wide Access"
+        : "Authorized: " + divisions;
+
+    document.getElementById("supervisorLogin").style.display =
+      "none";
+
+    document.getElementById("supervisorPanel").style.display =
+      "block";
+
+    setSupervisorStatus(
+      "Last updated: " + new Date().toLocaleTimeString()
+    );
+
+    if (!supervisorRefreshTimer) {
+
+      supervisorRefreshTimer = setInterval(() => {
+
+        if (!document.hidden) {
+          refreshSupervisorNotifications();
+        }
+
+      }, 60000);
+
+      supervisorExpiryTimer = setTimeout(() => {
+
+        clearSupervisorSession();
+
+        setSupervisorStatus(
+          "Session ended. Please sign in again."
+        );
+
+      }, 45 * 60 * 1000);
+
+    }
+
+  } catch (error) {
+
+    if (
+      session !== supervisorSession ||
+      request !== supervisorRequest
+    ) return;
+
+    clearSupervisorSession();
+
+    setSupervisorStatus(
+      "Unable to verify notifications. Please sign in again.",
+      true
+    );
+
+  }
+
+}
+
+function signOutSupervisor() {
+
+  clearSupervisorSession();
+
+  if (window.google?.accounts?.id) {
+    google.accounts.id.disableAutoSelect();
+  }
+
+  setSupervisorStatus(
+    "Signed out of supervisor notifications."
+  );
+
+}
+
+document.addEventListener("visibilitychange", () => {
+
+  if (!document.hidden && supervisorCredential) {
+    refreshSupervisorNotifications();
+  }
+
+});
+
+window.addEventListener("pagehide", () => {
+
+  clearSupervisorSession();
+
+  setSupervisorStatus("Supervisor sign-in required.");
+
+});
+
+</script>
 </body>
 </html>
 
