@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DCSO Supervisor Authentication</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0b1728;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.banner {
+  width: 100%;
+  display: block;
+}
+
+main {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: #142940;
+  border: 1px solid #d9ad52;
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+}
+
+h2 {
+  color: #d9ad52;
+}
+
+p {
+  color: #c4cfda;
+  line-height: 1.5;
+}
+
+#status {
+  margin-top: 20px;
+  padding: 15px;
+  background: #203951;
+  border-radius: 10px;
+}
+
+.signin {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.back {
+  display: block;
+  padding: 14px;
+  margin-top: 20px;
+  color: white;
+  text-decoration: none;
+  border: 1px solid #d9ad52;
+  border-radius: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<img class="banner"
+     src="DCSO_Original_Banner.jpg"
+     alt="DCSO Banner">
+
+<main>
+
+<div class="card">
+
+<h2>🔐 Supervisor Authentication</h2>
+
+<p>Sign in using your DCSO Google Workspace account.</p>
+
+<div id="g_id_onload"
+     data-client_id="728564434593-6o7o1var2gmt6m4c4shhcc6vd33ak9ec.apps.googleusercontent.com"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+</div>
+
+<div class="signin">
+
+<div class="g_id_signin"
+     data-type="standard"
+     data-size="large"
+     data-theme="outline"
+     data-text="signin_with"
+     data-shape="rectangular"
+     data-logo_alignment="left">
+</div>
+
+</div>
+
+<div id="status">
+  Waiting for Google sign-in...
+</div>
+
+<a class="back" href="./index.html">
+  ← Return to Employee Portal
+</a>
+
+</div>
+
+</main>
+
+<script>
+
+function handleCredentialResponse(response) {
+
+  const status = document.getElementById("status");
+
+  if (!response || !response.credential) {
+    status.textContent = "Sign-in unsuccessful.";
+    status.style.color = "#ff7777";
+    return;
+  }
+
+  status.textContent =
+    "Google sign-in response received. Secure server verification is not connected yet.";
+
+  status.style.color = "#f4d074";
+}
+
+</script>
+
+</body>
+</html>
