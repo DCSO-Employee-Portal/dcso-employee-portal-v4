@@ -120,7 +120,10 @@ p {
 
 <script>
 
-function handleCredentialResponse(response) {
+const API_URL =
+  "https://dcso-supervisor-api-728564434593.us-east1.run.app";
+
+async function handleCredentialResponse(response) {
 
   const status = document.getElementById("status");
 
@@ -131,9 +134,47 @@ function handleCredentialResponse(response) {
   }
 
   status.textContent =
-    "Google sign-in response received. Secure server verification is not connected yet.";
+    "Securely verifying your DCSO Workspace account...";
 
   status.style.color = "#f4d074";
+
+  try {
+
+    const result = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        credential: response.credential
+      }),
+      cache: "no-store"
+    });
+
+    const data = await result.json();
+
+    if (!result.ok || data.success !== true) {
+
+      status.textContent =
+        data.message || "Authentication denied.";
+
+      status.style.color = "#ff7777";
+      return;
+    }
+
+    status.textContent =
+      "Google Workspace identity successfully verified.";
+
+    status.style.color = "#75e09a";
+
+  } catch (error) {
+
+    status.textContent =
+      "Unable to connect to the secure authentication server.";
+
+    status.style.color = "#ff7777";
+
+  }
 }
 
 </script>
