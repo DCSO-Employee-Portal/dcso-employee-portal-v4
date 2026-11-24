@@ -9,6 +9,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1728">
 <title>DCSO Employee Portal</title>
+<!-- Dashboard build: supervisor-fix-157 -->
 
 <script src="https://accounts.google.com/gsi/client" defer></script>
 
@@ -36,6 +37,7 @@ nav button{background:none;border:0;color:white;font-size:11px;padding:7px 0;cur
 nav span{display:block;font-size:23px;margin-bottom:5px}
 @media(min-width:650px){.tiles{grid-template-columns:repeat(3,1fr)}}
 </style>
+</head>
 <body>
 
 <img class="banner" src="DCSO_Original_Banner.jpg" alt="DCSO Banner">
@@ -528,8 +530,7 @@ function searchDCSO() {
   });
 }
 </script>
-
-<script>
+ <script>
 
 const SUPERVISOR_API =
   "https://dcso-supervisor-api-728564434593.us-east1.run.app";
