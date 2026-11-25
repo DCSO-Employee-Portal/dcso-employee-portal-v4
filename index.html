@@ -116,6 +116,12 @@ nav span{display:block;font-size:23px;margin-bottom:5px}
        🔄 Refresh Notifications
     </button>
 
+    <p id="pushStatus" role="status" aria-live="polite">Push registration not checked.</p>
+    <p style="font-size:13px;">Use only on your own device. Alerts remain enabled after signing out or closing the portal.</p>
+    <button type="button" id="pushEnable" class="link" style="width:100%;" onclick="changePush('registerDevice')">📲 Enable Push Notifications</button>
+    <button type="button" id="pushDisable" class="link" style="width:100%;" onclick="changePush('unregisterDevice')">🔕 Disable Push Notifications</button>
+    <button type="button" class="link" style="width:100%;" onclick="changePush('deviceStatus')">Check Push Status</button>
+
     <button type="button"
        class="link"
        style="width:100%;"
@@ -570,6 +576,7 @@ function clearSupervisorSession() {
   supervisorRequest++;
 
   supervisorCredential = null;
+  document.getElementById("pushStatus").textContent = "Push registration not checked.";
 
   clearInterval(supervisorRefreshTimer);
   clearTimeout(supervisorExpiryTimer);
@@ -747,6 +754,65 @@ window.addEventListener("pagehide", () => {
   setSupervisorStatus("Supervisor sign-in required.");
 
 });
+
+
+const PUSH_CONFIG = {
+  apiKey: "AIzaSyBs2UCLz6dl0kA40PYEhVUG99o1mcOMZns",
+  authDomain: "dcso-employee-portal.firebaseapp.com",
+  projectId: "dcso-employee-portal",
+  storageBucket: "dcso-employee-portal.firebasestorage.app",
+  messagingSenderId: "728564434593",
+  appId: "1:728564434593:web:d71e230301450b919412e0"
+};
+const PUSH_VAPID = "BFKBXocD9IyuTKYpS7wvVWSYZDI3PLBjwc5AAxQPX7R1wUpTZwKvz_hjdoJdUQbQThsUvu-HMlSxI9g3cKIBGR8";
+let pushBusy = false;
+let pushModules;
+async function loadPush() {
+  if (!pushModules) {
+    pushModules = Promise.all([
+      import('https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/13.4.0/firebase-messaging.js')
+    ]).catch(error => { pushModules = null; throw error; });
+  }
+  const [app, msg] = await pushModules;
+  if (!(await msg.isSupported())) throw new Error('Push is not supported on this browser.');
+  const instance = app.getApps().find(a => a.name === 'dcso-push') || app.initializeApp(PUSH_CONFIG, 'dcso-push');
+  return {msg, messaging: msg.getMessaging(instance)};
+}
+async function changePush(action) {
+  if (pushBusy || !supervisorCredential || document.getElementById('supervisorPanel').style.display === 'none') return;
+  const session = supervisorSession;
+  const credential = supervisorCredential;
+  const status = document.getElementById('pushStatus');
+  const report = message => { if (session === supervisorSession) status.textContent = message; };
+  pushBusy = true;
+  try {
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) throw new Error('Push is not supported on this browser.');
+    if (action === 'registerDevice' && Notification.permission !== 'granted') {
+      if (await Notification.requestPermission() !== 'granted') throw new Error('Notification permission was not granted.');
+    }
+    if (Notification.permission !== 'granted') throw new Error('Browser notifications are blocked or not enabled.');
+    report('Checking device registration…');
+    const {msg, messaging} = await loadPush();
+    const registration = await navigator.serviceWorker.register('./sw.js');
+    const ready = await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('Service worker not ready.')), 15000))]);
+    if (ready.scope !== registration.scope) throw new Error('Unexpected service worker scope.');
+    const token = await msg.getToken(messaging, {vapidKey: PUSH_VAPID, serviceWorkerRegistration: ready});
+    if (!token) throw new Error('No device token available.');
+    if (session !== supervisorSession) return;
+    const response = await fetch(SUPERVISOR_API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({credential, action, token}), cache:'no-store', redirect:'error'});
+    const data = await response.json();
+    if (!response.ok || data.success !== true) throw new Error(data.message || 'Device registration request failed.');
+    if (action === 'unregisterDevice') {
+      await msg.deleteToken(messaging);
+      report('Push notifications disabled.');
+    } else {
+      report(data.enabled === true ? 'Push registration enabled — delivery testing pending.' : 'Push registration not enabled for this account.');
+    }
+  } catch (error) {
+    report(error.message || 'Push operation failed.');
+  } finally { pushBusy = false; }
+}
 
 </script>
 </body>
